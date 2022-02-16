@@ -7,6 +7,9 @@ namespace CabInvoiceTest
     [TestClass]
     public class InvoiceGeneratorTest
     {
+        /* Test Methods For UC-1 And Uc-5
+         * RideType- NORMAL And PREMIUM.
+         */
         [TestMethod]
         [TestCategory("NormalRideFare")]
         public void GivenDistanceAndTime_ShouldReturnTotalFareForNormalRide()
