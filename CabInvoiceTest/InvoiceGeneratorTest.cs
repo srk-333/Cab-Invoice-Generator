@@ -7,6 +7,14 @@ namespace CabInvoiceTest
     [TestClass]
     public class InvoiceGeneratorTest
     {
+        public InvoiceGenerator premium;
+        public InvoiceGenerator normal;  
+        [TestInitialize]
+        public void Setup()
+        {
+            normal = new InvoiceGenerator(RideType.NORMAL);
+            premium = new InvoiceGenerator(RideType.PREMIUM);
+        }
         /* Test Methods For UC-1 And Uc-5
          * RideType- NORMAL And PREMIUM.
          */
@@ -14,7 +22,7 @@ namespace CabInvoiceTest
         [TestCategory("NormalRideFare")]
         public void GivenDistanceAndTime_ShouldReturnTotalFareForNormalRide()
         {
-            double excepted = 25;
+            double excepted = 25.0;
             double distance = 2.0;
             int time = 5;
             InvoiceGenerator invoice = new InvoiceGenerator(RideType.NORMAL);
@@ -25,12 +33,80 @@ namespace CabInvoiceTest
         [TestCategory("PremiumRideFare")]
         public void GivenDistanceAndTime_ShouldReturnTotalFareForPremiumRide()
         {
-            double excepted = 40;
+            double excepted = 40.0;
             double distance = 2.0;
             int time = 5;
             InvoiceGenerator invoice = new InvoiceGenerator(RideType.PREMIUM);
             double fare = invoice.CalculateFare(distance, time);
             Assert.AreEqual(excepted, fare);
+        }
+        [TestMethod]
+        [TestCategory("NegativeDistanceValue")]
+        public void GivenNegativeDistance_ShouldReturnInvalidDistanceException()
+        {
+            string expected = "Distance Cann't be Negative";
+            double distance = -1.0;
+            int time = 5;
+            try
+            {             
+                double fare = normal.CalculateFare(distance, time);
+            }
+            catch (CabInvoiceException ex)
+            {
+                Assert.AreEqual(expected, ex.Message);
+            }
+        }
+        [TestMethod]
+        [TestCategory("NegativeTimeValue")]
+        public void GivenNegativeTime_ShouldReturnInvalidTimeException()
+        {
+            string expected = "Time Cann't be Negative";
+            double distance = 3.0;
+            int time = -5;
+            try
+            {
+                double fare = premium.CalculateFare(distance, time);
+            }
+            catch (CabInvoiceException ex)
+            {
+                Assert.AreEqual(expected, ex.Message);
+            }
+        }
+        /* Test Methods For UC-2
+         * Multiple Ride
+         */
+        [TestMethod]
+        [TestCategory("MltipleRideFareForNormalRideType")]
+        public void GivenMultipleRide_ShouldReturnTotalAggregateFareForNormalRide()
+        {
+            Ride[] rides = { new Ride(3.0, 5), new Ride(4.0, 10) };
+            double expected = 85.0 ;
+            double actual = normal.MultipleRide(rides);         
+            Assert.AreEqual(expected , actual);
+        }
+        [TestMethod]
+        [TestCategory("MltipleRideFareForPremiumRideType")]
+        public void GivenMultipleRide_ShouldReturnTotalAggregateFareForPremiumRide()
+        {
+            Ride[] rides = { new Ride(2.0, 5), new Ride(3.0, 10) };
+            double expected = 105.0;
+            double actual = premium.MultipleRide(rides);
+            Assert.AreEqual(expected, actual);
+        }
+        [TestMethod]
+        [TestCategory("NullRide")]
+        public void GivenNullRide_ShouldReturnNullRideException()
+        {
+            Ride[] rides = { };
+            string expected = "Null Ride";
+            try
+            {
+                double actual = premium.MultipleRide(rides);
+            }
+            catch (CabInvoiceException ex)
+            {
+                Assert.AreEqual(expected , ex.Message);
+            }
         }
     }
 }
